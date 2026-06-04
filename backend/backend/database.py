@@ -1,42 +1,45 @@
 # backend/database.py
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, Text, ForeignKey
+from datetime import datetime
 import os
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from dotenv import load_dotenv
 
-# Expect asyncpg URL, e.g.
-# postgresql+asyncpg://user:pass@localhost:5432/sfrs_db
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://username:password@localhost:5432/sfrs_db",
-)
+load_dotenv()
 
-# Async engine with connection pooling
+# Your PostgreSQL config (port 3000!)
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "3000")  # ← Your custom port
+DB_NAME = os.getenv("DB_NAME", "recruitment_system")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "2008semo13")
+
+# Async PostgreSQL connection URL
+DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# Create async engine
 engine = create_async_engine(
     DATABASE_URL,
-    pool_pre_ping=True,
-    pool_size=int(os.getenv("DB_POOL_SIZE", "5")),
-    max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
-    pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", "30")),
-    pool_recycle=int(os.getenv("DB_POOL_RECYCLE", "1800")),
+    echo=True,  # Set to False in production
+    pool_size=5,
+    max_overflow=10
 )
 
-AsyncSessionLocal = sessionmaker(
-    bind=engine,
+# Create async session factory
+AsyncSessionLocal = async_sessionmaker(
+    engine,
     class_=AsyncSession,
-    expire_on_commit=False,
-    autocommit=False,
-    autoflush=False,
+    expire_on_commit=False
 )
 
+# Base class for models
 Base = declarative_base()
 
-# Dependency to yield a database session per request safely
+# Dependency to get DB session
 async def get_db():
     async with AsyncSessionLocal() as session:
         try:
             yield session
         finally:
-            # session is closed by async context manager
-            pass
-
-
+            await session.close()
