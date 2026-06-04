@@ -1,12 +1,12 @@
- # ERP Stack Transition TODO
+# ERP Stack Transition TODO
 
 ## Backend (PostgreSQL + async SQLAlchemy)
-- [x] Implement `backend/backend/database.py` with asyncpg engine + `get_db` dependency.
-- [x] Implement full PostgreSQL SQLAlchemy ORM models in `backend/backend/models.py` matching current UI/API payloads.
-- [x] Add async startup initialization + secure seeding for empty tables.
+- [ ] Implement `backend/backend/database.py` with asyncpg engine + `get_db` dependency.
+- [ ] Implement full PostgreSQL SQLAlchemy ORM models in `backend/backend/models.py` matching current UI/API payloads.
+- [ ] Add async startup initialization + secure seeding for empty tables.
 
 ## Backend REST API (`backend/main.py`)
-- [x] Replace SQLite implementation with async SQLAlchemy session usage.
+- [ ] Replace SQLite implementation with async SQLAlchemy session usage.
 - [ ] Add Pydantic schemas and strict validations for:
   - [ ] POST `/api/jobs` (including vacancies > 0, date parsing, salary text -> NUMERIC parsing)
   - [ ] GET `/api/dashboard`
@@ -21,7 +21,7 @@
 - [ ] Ensure robust error handling (DB disconnects, validation errors).
 
 ## Frontend alignment
-- [x] Refactor `cit-dashboard/src/pages/Jobmanagement.jsx` (or create alias) so it calls `apiPost` and matches backend validation.
+- [ ] Refactor `cit-dashboard/src/pages/JobManagement.jsx` (or create alias) so it calls `apiPost` and matches backend validation.
 - [ ] Update other pages only if API response shape changes.
 
 ## Testing/Run
